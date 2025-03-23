@@ -399,7 +399,15 @@ Retrieves all active trading positions for the authenticated user.
       "realized_pnl_percentage": number,
       "unrealized_pnl_percentage": number,
       "average_buy_price": number,
-      "current_price": number
+      "current_price": number,
+      "auto_take_profit": {
+        "price_percentage": "string",
+        "amount_percentage": "string"
+      } | null,
+      "auto_stop_loss": {
+        "price_percentage": "string",
+        "amount_percentage": "string"
+      } | null
     }
   ]
   ```
@@ -440,7 +448,15 @@ Retrieves detailed information about a specific trading position.
     "realized_pnl_percentage": number,
     "unrealized_pnl_percentage": number,
     "average_buy_price": number,
-    "current_price": number
+    "current_price": number,
+    "auto_take_profit": {
+      "price_percentage": "string",
+      "amount_percentage": "string"
+    } | null,
+    "auto_stop_loss": {
+      "price_percentage": "string",
+      "amount_percentage": "string"
+    } | null
   }
   ```
 
