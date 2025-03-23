@@ -19,6 +19,11 @@ This document provides detailed information about the available API endpoints fo
   - [Sell Token](#sell-token)
   - [Get Positions](#get-positions)
   - [Get Position by ID](#get-position-by-id)
+  - [Create Auto Take Profit](#create-auto-take-profit)
+  - [Create Auto Stop Loss](#create-auto-stop-loss)
+  - [Cancel Auto Take Profit](#cancel-auto-take-profit)
+  - [Cancel Auto Stop Loss](#cancel-auto-stop-loss)
+  - [Get Transaction Details](#get-transaction-details)
 - [Token API](#token-api)
   - [Get Token Info](#get-token-info)
 - [Settings API](#settings-api)
@@ -297,13 +302,13 @@ Exports the user's wallet including private key and mnemonic phrase.
 
 ## Trade API
 
-The Trade API provides endpoints for executing trades, managing positions, and tracking performance.
+The Trade API provides endpoints for buying and selling tokens, managing positions, and setting up automated trading strategies.
 
 Base URL: `/api/trade`
 
 ### Buy Token
 
-Initiates a token purchase transaction.
+Purchases a token using the specified amount of native currency.
 
 - **URL**: `/api/trade/buy`
 - **Method**: `POST`
@@ -311,23 +316,28 @@ Initiates a token purchase transaction.
 - **Request Body**:
   ```json
   {
-    "address": "HsKDKwGhR9wKh62CUHmUUXmb2jBwoFkfsbCUKtCppump",
-    "amount": 0.002,
-    "chain_code": "solana"
+    "address": "string",
+    "amount": number,
+    "chain_code": "string",
+    "mode": "SWAP" | "LIMIT"
   }
   ```
-- **Response**: 
+  - `address`: The token address to purchase
+  - `amount`: Amount of native currency to spend
+  - `chain_code`: Blockchain code (e.g., "solana")
+  - `mode`: Optional swap mode, defaults to "SWAP"
+- **Response**:
   ```json
   {
     "success": true,
-    "transaction": "33upMkF2jQTPjcNVk9vUSriPEsjPvy1bukpkqj18Br7oeWZvd4zsb7zB9SxLr7xWkbacxznpyJXPkhu5Cqmtewww",
-    "txLink": "https://explorer.solana.com/tx/33upMkF2jQTPjcNVk9vUSriPEsjPvy1bukpkqj18Br7oeWZvd4zsb7zB9SxLr7xWkbacxznpyJXPkhu5Cqmtewww"
+    "transaction": "string",
+    "txLink": "string"
   }
   ```
 
 ### Sell Token
 
-Initiates a token sell transaction.
+Sells a token for native currency.
 
 - **URL**: `/api/trade/sell`
 - **Method**: `POST`
@@ -335,23 +345,28 @@ Initiates a token sell transaction.
 - **Request Body**:
   ```json
   {
-    "address": "HsKDKwGhR9wKh62CUHmUUXmb2jBwoFkfsbCUKtCppump",
-    "amount": 107741.461161,
-    "chain_code": "solana"
+    "address": "string",
+    "amount": number,
+    "chain_code": "string",
+    "mode": "SWAP" | "LIMIT"
   }
   ```
-- **Response**: 
+  - `address`: The token address to sell
+  - `amount`: Amount of token to sell
+  - `chain_code`: Blockchain code (e.g., "solana")
+  - `mode`: Optional swap mode, defaults to "SWAP"
+- **Response**:
   ```json
   {
     "success": true,
-    "transaction": "2JWEoKqXqremXzAbZzNTuEpgGUk4ZVQYYMQjMZ8kuaMXr2FrzgK3VPRM959jvFMQjVysCbQiouLYJEJmapY7cBAS",
-    "txLink": "https://explorer.solana.com/tx/2JWEoKqXqremXzAbZzNTuEpgGUk4ZVQYYMQjMZ8kuaMXr2FrzgK3VPRM959jvFMQjVysCbQiouLYJEJmapY7cBAS"
+    "transaction": "string",
+    "txLink": "string"
   }
   ```
 
 ### Get Positions
 
-Retrieves all trading positions for the authenticated user.
+Retrieves all active trading positions for the authenticated user.
 
 - **URL**: `/api/trade/positions`
 - **Method**: `GET`
@@ -360,72 +375,149 @@ Retrieves all trading positions for the authenticated user.
   ```json
   [
     {
-      "chainId": "solana",
-      "pairAddress": "5VnERYyP8sMDjc7kQiseQG149WqN68n3rFZz5qTSNqQf",
-      "baseToken": {
-        "address": "HsKDKwGhR9wKh62CUHmUUXmb2jBwoFkfsbCUKtCppump",
-        "name": "Elon Marsk",
-        "symbol": "ELONM"
+      "id": "string",
+      "chain_id": "string",
+      "pair_address": "string",
+      "base_token": {
+        "address": "string",
+        "name": "string",
+        "symbol": "string"
       },
-      "quoteToken": {
-        "address": "So11111111111111111111111111111111111111112",
-        "name": "Wrapped SOL",
-        "symbol": "SOL"
+      "quote_token": {
+        "address": "string",
+        "name": "string",
+        "symbol": "string"
       },
-      "netAmount": 107741.461161,
-      "totalBought": 107741.461161,
-      "totalSold": 0,
-      "countSwap": 1,
-      "countBuy": 1,
-      "countSell": 0,
-      "realizedPnL": 0,
-      "unrealizedPnL": 0,
-      "realizedPnLPercentage": 0,
-      "unrealizedPnLPercentage": 0,
-      "averageBuyPrice": 1.8562955973015477e-8,
-      "currentPrice": 1.8562955973015477e-8
+      "net_amount": number,
+      "total_bought": number,
+      "total_sold": number,
+      "count_swap": number,
+      "count_buy": number,
+      "count_sell": number,
+      "realized_pnl": number,
+      "unrealized_pnl": number,
+      "realized_pnl_percentage": number,
+      "unrealized_pnl_percentage": number,
+      "average_buy_price": number,
+      "current_price": number
     }
   ]
   ```
 
 ### Get Position by ID
 
-Retrieves a specific trading position by ID.
+Retrieves detailed information about a specific trading position.
 
 - **URL**: `/api/trade/positions/:id`
 - **Method**: `GET`
 - **Authentication**: JWT Auth (Bearer Token)
-- **Parameters**:
-  - `id`: The position ID to retrieve (format: `{chain_code}-{token_address}`)
+- **URL Parameters**:
+  - `id`: Position ID
 - **Response**:
   ```json
   {
-    "chain_id": "solana",
-    "pair_address": "5VnERYyP8sMDjc7kQiseQG149WqN68n3rFZz5qTSNqQf",
+    "id": "string",
+    "chain_id": "string",
+    "pair_address": "string",
     "base_token": {
-        "address": "HsKDKwGhR9wKh62CUHmUUXmb2jBwoFkfsbCUKtCppump",
-        "name": "Elon Marsk",
-        "symbol": "ELONM"
+      "address": "string",
+      "name": "string",
+      "symbol": "string"
     },
     "quote_token": {
-        "address": "So11111111111111111111111111111111111111112",
-        "name": "Wrapped SOL",
-        "symbol": "SOL"
+      "address": "string",
+      "name": "string",
+      "symbol": "string"
     },
-    "net_amount": 0,
-    "total_bought": 107741.461161,
-    "total_sold": 107741.461161,
-    "count_swap": 2,
-    "count_buy": 1,
-    "count_sell": 1,
-    "realized_pnl": -4.000000000002137e-7,
-    "unrealized_pnl": 0,
-    "realized_pnl_percentage": -4.000000000002137e-7,
-    "unrealized_pnl_percentage": 0,
-    "average_buy_price": 1.8562955973015477e-8,
-    "current_price": 2.2443224656187884e-8
+    "net_amount": number,
+    "total_bought": number,
+    "total_sold": number,
+    "count_swap": number,
+    "count_buy": number,
+    "count_sell": number,
+    "realized_pnl": number,
+    "unrealized_pnl": number,
+    "realized_pnl_percentage": number,
+    "unrealized_pnl_percentage": number,
+    "average_buy_price": number,
+    "current_price": number
   }
   ```
+
+### Create Auto Take Profit
+
+Sets up an automatic take profit order for a position.
+
+- **URL**: `/api/trade/positions/:id/create-auto-take-profit`
+- **Method**: `POST`
+- **Authentication**: JWT Auth (Bearer Token)
+- **URL Parameters**:
+  - `id`: Position ID
+- **Request Body**:
+  ```json
+  {
+    "price_percentage": number,
+    "amount_percentage": number
+  }
+  ```
+  - `price_percentage`: Target price percentage increase for take profit
+  - `amount_percentage`: Percentage of position to sell when target is reached
+- **Response**: Position object with updated take profit settings
+
+### Create Auto Stop Loss
+
+Sets up an automatic stop loss order for a position.
+
+- **URL**: `/api/trade/positions/:id/create-auto-stop-loss`
+- **Method**: `POST`
+- **Authentication**: JWT Auth (Bearer Token)
+- **URL Parameters**:
+  - `id`: Position ID
+- **Request Body**:
+  ```json
+  {
+    "price_percentage": number,
+    "amount_percentage": number
+  }
+  ```
+  - `price_percentage`: Target price percentage decrease for stop loss
+  - `amount_percentage`: Percentage of position to sell when target is reached
+- **Response**: Position object with updated stop loss settings
+
+### Cancel Auto Take Profit
+
+Cancels an existing take profit order for a position.
+
+- **URL**: `/api/trade/positions/:id/cancel-auto-take-profit`
+- **Method**: `POST`
+- **Authentication**: JWT Auth (Bearer Token)
+- **URL Parameters**:
+  - `id`: Position ID
+- **Response**: Position object with take profit settings removed
+
+### Cancel Auto Stop Loss
+
+Cancels an existing stop loss order for a position.
+
+- **URL**: `/api/trade/positions/:id/cancel-auto-stop-loss`
+- **Method**: `POST`
+- **Authentication**: JWT Auth (Bearer Token)
+- **URL Parameters**:
+  - `id`: Position ID
+- **Response**: Position object with stop loss settings removed
+
+### Get Transaction Details
+
+Retrieves detailed information about a specific transaction.
+
+- **URL**: `/api/trade/transaction/:signature`
+- **Method**: `GET`
+- **Authentication**: JWT Auth (Bearer Token)
+- **URL Parameters**:
+  - `signature`: Transaction signature/hash
+- **Query Parameters**:
+  - `address`: Wallet address associated with the transaction
+- **Response**: Detailed transaction information including status, confirmations, and execution details
 
 ## Token API
 
